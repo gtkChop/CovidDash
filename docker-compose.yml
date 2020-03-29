@@ -1,0 +1,38 @@
+version: '2'
+volumes:
+  configuration:
+networks:
+  default:
+services:
+  nginx-proxy:
+    container_name: nginx-proxy
+    restart: on-failure
+    image: "jwilder/nginx-proxy
+    networks:
+      default:
+        aliases:
+          - $HOST
+    ports:
+      - "80:80"
+    volumes:
+      - "./nginx/conf.d/proxy.conf:/etc/nginx/conf.d/proxy.conf"
+      - "./nginx/vhost.d:/etc/nginx/vhost.d"
+      - "./nginx/ssl/certs:/etc/nginx/certs"
+      - "./nginx/html:/usr/share/nginx/html"
+      - "./nginx/htpasswd:/etc/nginx/htpasswd"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+  dash:
+    container_name: dash
+    build:
+      context: ./coviddash
+      dockerfile: Dockerfile
+    environment:
+      - SITE_HOST=${HOST}
+      - SITE_SCHEME=${SITE_SCHEME}://
+      - VIRTUAL_HOST=${HOST}
+      - VIRTUAL_PROTO=${SITE_SCHEME}
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - JOBLIB_MULTIPROCESSING=0
+    ports:
+      - 8050:8050

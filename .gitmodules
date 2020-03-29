@@ -1,0 +1,3 @@
+[submodule "coviddash/covidviz"]
+	path = coviddash/covidviz
+	url = git@github.com:gtkChop/covidviz.git
